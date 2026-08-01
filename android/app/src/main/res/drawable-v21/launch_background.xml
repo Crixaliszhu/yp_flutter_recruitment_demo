@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modify this file to customize your launch splash screen -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Native splash background. It must be visibly different from the Flutter first page. -->
+    <item android:drawable="@color/native_splash_background" />
+
+    <item
+        android:width="132dp"
+        android:height="56dp"
+        android:gravity="center"
+        android:drawable="@drawable/native_splash_badge" />
+</layer-list>
