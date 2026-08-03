@@ -1,39 +1,37 @@
-import '../core/network/api_client.dart';
-import '../core/storage/key_value_storage.dart';
-import '../features/home/data/home_repository_impl.dart';
-import '../features/home/domain/home_use_case.dart';
-import '../features/market/data/market_repository_impl.dart';
-import '../features/market/domain/market_use_case.dart';
-import '../features/message/data/message_repository_impl.dart';
-import '../features/message/domain/message_use_case.dart';
-import '../features/mine/data/mine_repository_impl.dart';
-import '../features/mine/domain/mine_use_case.dart';
-import 'app_dependencies.dart';
+import '../adapter/splash_ad/splash_ad_adapter.dart';
+import '../data/common/network/api_client.dart';
+import '../data/common/network/network_loading_controller.dart';
+import '../data/common/storage/key_value_storage.dart';
+import '../ui/core/toast/app_toast.dart';
+import 'app_runtime.dart';
 
 /// 应用启动装配器。
 ///
-/// 大型项目里通常由 DI 框架、原生启动参数或远程配置参与初始化。demo 用手写
-/// 方式显式展示依赖方向：storage/network -> repository -> use case -> page。
+/// 这里只初始化跨业务域共享的基础运行时能力，不登记页面和 VM。
+/// 每个页面需要什么依赖，由页面和对应 VM 自行确定。
 class AppBootstrap {
   const AppBootstrap._();
 
-  static Future<AppDependencies> create() async {
+  static Future<void> init() async {
     final storage = await KeyValueStorage.create();
     // 模拟原生容器在启动 Flutter 前注入登录态；真实项目可来自 MethodChannel/Pigeon。
     await storage.setString(StorageKeys.accessToken, 'mock-token-from-native');
+    final loadingController = NetworkLoadingController(
+      onShow: () => AppToast.showLoading(),
+      onDismiss: AppToast.hideLoading,
+    );
 
     final apiClient = ApiClient(
       baseUrl: 'https://mock.recruitment.yupao.local',
       tokenProvider: () => storage.getString(StorageKeys.accessToken),
+      loadingController: loadingController,
     );
 
-    return AppDependencies(
+    AppRuntime.init(
       storage: storage,
       apiClient: apiClient,
-      homeUseCase: HomeUseCase(HomeRepositoryImpl(apiClient)),
-      marketUseCase: MarketUseCase(MarketRepositoryImpl(apiClient)),
-      messageUseCase: MessageUseCase(MessageRepositoryImpl(apiClient)),
-      mineUseCase: MineUseCase(MineRepositoryImpl(apiClient, storage)),
+      splashAdAdapter: const SplashAdAdapter(),
+      loadingController: loadingController,
     );
   }
 }

@@ -4,10 +4,12 @@
 class AppRoutes {
   const AppRoutes._();
 
+  static const launch = '/launch';
   static const home = '/home';
   static const homeDetail = '/home/detail';
   static const market = '/market';
   static const marketDetail = '/market/detail';
+  static const overlayDemo = '/demo/overlay';
   static const message = '/message';
   static const messageDetail = '/message/detail';
   static const mine = '/mine';

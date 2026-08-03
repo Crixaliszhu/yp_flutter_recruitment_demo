@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
+<!-- 原生启动页背景。 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Native splash background. It must be visibly different from the Flutter first page. -->
+    <!-- 保持与 Flutter 首屏底色不同，便于识别原生启动页。 -->
     <item android:drawable="@color/native_splash_background" />
 
     <item

@@ -1,68 +1,65 @@
 # 纯 Flutter 大型业务架构示例
 
-这个 demo 模拟 `recruitment_android` 一类大型项目逐步跨端化后的 Flutter 形态：Android/iOS 只提供原生启动页和容器能力，首页、四个 tab、二级页、网络、缓存、路由和业务编排全部在 Flutter 内完成。
+这个 demo 模拟大型招聘 App 的偏纯 Flutter 架构：Android/iOS 负责进程初始化、原生启动页、启动广告和 FlutterEngine 预热；Flutter 负责启动后的路由、业务页面、业务广告状态、埋点和失败兜底 UI。
 
 ## 启动边界
 
-- Android: `android/app/src/main/AndroidManifest.xml` 使用 `@style/LaunchTheme`，`launch_background.xml` 是蓝色原生启动页；Flutter 第一帧绘制后进入 `MainActivity` 承载的 Flutter 首页。
-- iOS: `ios/Runner/Base.lproj/LaunchScreen.storyboard` 是蓝色原生 LaunchScreen；业务页面从 `lib/main.dart` 启动。
-- Flutter: `lib/main.dart` 只做初始化，`AppBootstrap` 装配网络、存储、Repository、UseCase。
+- Android: `MainApplication` 做轻量进程初始化，`SplashActivity` 展示原生启动/广告页并预热 FlutterEngine，`MainActivity` 复用 cached engine 承载 Flutter。
+- iOS: `AppDelegate` 预热 `mainFlutterEngine`，`SplashViewController` 展示原生启动/广告页，然后打开复用 engine 的 `FlutterViewController`。
+- Flutter: `lib/main.dart` 只初始化依赖并启动 `RecruitmentDemoApp`，首个 Flutter 业务路由是 `/launch`。
 
-## 分层
+## 分层结构
 
 ```text
 lib/
-  app/                 应用启动、依赖装配
-  core/
-    network/           ApiClient、拦截器、mock transport
-    storage/           KeyValueStorage，本地 KV 抽象
-  routing/             全局路由表与 route path 常量
-  shell/               4 tab 主壳
-  shared/              跨业务可复用 UI/模型
-  features/
-    home/              首页域
-    market/            集市域
-    message/           消息域
-    mine/              个人中心域
+  adapter/              平台差异和原生能力适配，例如启动广告状态
+  app/                  应用启动、依赖装配
+  data/                 Data 层，先按层切，再按业务域切
+    common/             网络、存储等共享数据基础设施
+    launch/             启动配置数据域
+    home/               首页数据域
+    market/             集市数据域
+    message/            消息数据域
+    mine/               个人中心数据域
+  routing/              全局路由基础设施
+  shared/               跨业务域共享模型和组件
+  ui/                   UI 层，先按层切，再按业务域/页面切
+    core/               一级 tab shell、主题等 UI 基础设施
+    launch/             Flutter 启动业务页
+    home/
+    market/
+    message/
+    mine/
 ```
 
-每个业务域都按 `data/domain/presentation` 拆分：
+## 依赖方向
 
-- `presentation`: Flutter 页面、组件、View 交互。
-- `domain`: Repository 接口和 UseCase，承载业务动作。
-- `data`: Repository 实现，组合网络、缓存、平台能力。
+```text
+Page -> VM -> Repo -> RDS -> ApiClient
+Page -> VM -> Repo -> Storage
+Page -> VM -> Adapter
+```
+
+当前 demo 暂不引入 UseCase 和 Composer：
+
+- `UseCase`: 等出现复杂业务流程、跨页面业务动作或跨域流程时再加。
+- `Composer`: 等 Data 层出现同域多接口编排、数据聚合、排序过滤等场景时再加。
+- `VMBlock`: 等单个 VM 变大后，用来拆分页面逻辑块。
 
 ## 路由设计
 
-`go_router` 负责全局路由，`StatefulShellRoute.indexedStack` 只承载四个一级 tab；二级页注册在 shell 外，打开后是完整独立页面，不显示底部 tab：
+`/launch` 是 Flutter 启动业务页。四个一级 tab 使用 `StatefulShellRoute.indexedStack` 保持状态，二级页注册在 shell 外层，因此打开后不显示底部 tab。
 
-- `/home` -> `/home/detail`
-- `/market` -> `/market/detail`
-- `/message` -> `/message/detail`
-- `/mine` -> `/mine/detail`
+```text
+/launch
+/home         -> /home/detail
+/market       -> /market/detail
+/message      -> /message/detail
+/mine         -> /mine/detail
+```
 
-跨域跳转只依赖 `AppRoutes`，不要让 `home` 直接 import `message` 的页面实现。大型项目可继续演进为每个业务包暴露 `RouteEntry` 注册表。
+## 启动广告设计
 
-## 网络库设计
+启动广告优先由 Android/iOS 原生承接，因为广告 SDK 初始化、隐私合规、冷启动生命周期和超时兜底更贴近平台。Flutter 侧通过 `SplashAdAdapter` 接收广告状态或兜底超时，继续完成启动后的路由分发。
 
-`ApiClient` 封装 Dio：
-
-- 统一 `baseUrl`、header、token 注入。
-- 统一返回 `ApiResult<T>`。
-- demo 使用 `MockApiTransport` 避免真实服务依赖；真实项目把 transport 替换为 Dio 请求即可。
-- 业务层只依赖 Repository，不直接依赖 Dio。
-
-## 存储设计
-
-`KeyValueStorage` 是存储接口示例，当前 demo 用纯 Dart 内存实现，便于无插件环境直接运行：
-
-- token、当前角色等简单状态走 KV。
-- 复杂缓存可新增 `core/database`，例如 Drift/Isar。
-- Android/iOS 生产环境可把实现替换为 `shared_preferences`、`flutter_secure_storage` 或数据库，调用方不用改。
-
-## 已覆盖的业务交互
-
-- 原生启动页后进入 Flutter 首页。
-- 首页包含 4 个 tab：首页、集市、消息、个人中心。
-- 每个 tab 都有按钮跳转自己的 Flutter 二级页。
-- 四个二级页分属不同业务域，展示跨域隔离、路由跳转、本地存储和网络 mock。
+业务内广告可以由 Flutter 统一 API 调用，底层继续由 Android/iOS 原生 SDK 实现。

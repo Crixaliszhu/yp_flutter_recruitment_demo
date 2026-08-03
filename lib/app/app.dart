@@ -1,21 +1,19 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 
 import '../routing/app_router.dart';
-import 'app_dependencies.dart';
 
 /// 应用根组件。
 ///
-/// 这里只组装跨端通用能力：主题、全局路由和依赖容器。不要在根组件里写
-/// 具体业务逻辑，业务应继续下沉到各 feature 的 presentation/domain/data。
+/// 这里只组装跨端通用能力：主题和全局路由。不要在根组件里写具体业务逻辑，
+/// 业务应继续下沉到 `ui` 和 `data` 对应业务域。
 class RecruitmentDemoApp extends StatelessWidget {
-  const RecruitmentDemoApp({super.key, required this.dependencies});
-
-  final AppDependencies dependencies;
+  const RecruitmentDemoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Router 持有业务依赖，页面通过 UseCase 获取能力，避免页面自己 new data 层对象。
-    final router = createAppRouter(dependencies);
+    // Router 只负责路由匹配和参数解析，不创建页面内部依赖。
+    final router = createAppRouter();
 
     return MaterialApp.router(
       title: 'Yupao Flutter Demo',
@@ -29,6 +27,9 @@ class RecruitmentDemoApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routerConfig: router,
+      builder: (context, child) {
+        return BotToastInit()(context, child ?? const SizedBox.shrink());
+      },
     );
   }
 }

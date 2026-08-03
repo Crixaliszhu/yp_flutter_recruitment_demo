@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Keep this color distinct from Flutter scaffoldBackgroundColor for splash verification. -->
+    <!-- 保持与 Flutter scaffoldBackgroundColor 不同，便于验证启动页。 -->
     <color name="native_splash_background">#1677FF</color>
 </resources>

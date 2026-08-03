@@ -1,37 +1,45 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:go_router/go_router.dart';
 
-import '../app/app_dependencies.dart';
-import '../features/home/presentation/home_detail_page.dart';
-import '../features/home/presentation/home_tab_page.dart';
-import '../features/market/presentation/market_detail_page.dart';
-import '../features/market/presentation/market_tab_page.dart';
-import '../features/message/presentation/message_detail_page.dart';
-import '../features/message/presentation/message_tab_page.dart';
-import '../features/mine/presentation/mine_detail_page.dart';
-import '../features/mine/presentation/mine_tab_page.dart';
-import '../shell/main_tab_scaffold.dart';
+import '../ui/core/shell/main_tab_scaffold.dart';
+import '../ui/demo/overlay/page/overlay_demo_page.dart';
+import '../ui/home/home_detail/page/home_detail_page.dart';
+import '../ui/home/home_tab/page/home_tab_page.dart';
+import '../ui/launch/launch_page/page/launch_page.dart';
+import '../ui/market/market_detail/page/market_detail_page.dart';
+import '../ui/market/market_tab/page/market_tab_page.dart';
+import '../ui/message/message_detail/page/message_detail_page.dart';
+import '../ui/message/message_tab/page/message_tab_page.dart';
+import '../ui/mine/mine_detail/page/mine_detail_page.dart';
+import '../ui/mine/mine_tab/page/mine_tab_page.dart';
 import 'app_routes.dart';
 
 /// 创建应用路由表。
 ///
-/// 一级 tab 放在 StatefulShellRoute 中，以保留每个 tab 的独立导航栈。二级页放在
-/// shell 外层，这样打开后是完整独立页面，不会继续显示底部四个 tab。
-GoRouter createAppRouter(AppDependencies dependencies) {
+/// `/launch` 是原生启动/广告之后的 Flutter 启动业务页。一级 tab 放在
+/// StatefulShellRoute 内，二级页放在外层，避免保留底部 tab。
+GoRouter createAppRouter() {
   return GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.launch,
+    observers: [BotToastNavigatorObserver()],
     routes: [
+      GoRoute(
+        path: AppRoutes.launch,
+        builder: (context, state) {
+          return const LaunchPage();
+        },
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainTabScaffold(navigationShell: navigationShell);
         },
-        // 四个一级业务域：home、market、message、mine。
         branches: [
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: AppRoutes.home,
                 builder: (context, state) {
-                  return HomeTabPage(useCase: dependencies.homeUseCase);
+                  return const HomeTabPage();
                 },
               ),
             ],
@@ -41,7 +49,7 @@ GoRouter createAppRouter(AppDependencies dependencies) {
               GoRoute(
                 path: AppRoutes.market,
                 builder: (context, state) {
-                  return MarketTabPage(useCase: dependencies.marketUseCase);
+                  return const MarketTabPage();
                 },
               ),
             ],
@@ -51,7 +59,7 @@ GoRouter createAppRouter(AppDependencies dependencies) {
               GoRoute(
                 path: AppRoutes.message,
                 builder: (context, state) {
-                  return MessageTabPage(useCase: dependencies.messageUseCase);
+                  return const MessageTabPage();
                 },
               ),
             ],
@@ -61,36 +69,49 @@ GoRouter createAppRouter(AppDependencies dependencies) {
               GoRoute(
                 path: AppRoutes.mine,
                 builder: (context, state) {
-                  return MineTabPage(useCase: dependencies.mineUseCase);
+                  return const MineTabPage();
                 },
               ),
             ],
           ),
         ],
       ),
-      // 以下 detail 路由刻意放在 shell 外，避免业务二级页被底部 tab 容器包住。
       GoRoute(
         path: AppRoutes.homeDetail,
         builder: (context, state) {
-          return HomeDetailPage(useCase: dependencies.homeUseCase);
+          return HomeDetailPage(
+            args: HomeDetailArgs.fromQuery(state.uri.queryParameters),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.marketDetail,
         builder: (context, state) {
-          return MarketDetailPage(useCase: dependencies.marketUseCase);
+          return MarketDetailPage(
+            args: MarketDetailArgs.fromQuery(state.uri.queryParameters),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.overlayDemo,
+        builder: (context, state) {
+          return const OverlayDemoPage();
         },
       ),
       GoRoute(
         path: AppRoutes.messageDetail,
         builder: (context, state) {
-          return MessageDetailPage(useCase: dependencies.messageUseCase);
+          return MessageDetailPage(
+            args: MessageDetailArgs.fromQuery(state.uri.queryParameters),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.mineDetail,
         builder: (context, state) {
-          return MineDetailPage(useCase: dependencies.mineUseCase);
+          return MineDetailPage(
+            args: MineDetailArgs.fromQuery(state.uri.queryParameters),
+          );
         },
       ),
     ],

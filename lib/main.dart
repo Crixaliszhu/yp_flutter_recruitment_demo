@@ -9,6 +9,6 @@ import 'app/app_bootstrap.dart';
 /// 存储与业务编排都从这里进入 Flutter 层。
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dependencies = await AppBootstrap.create();
-  runApp(RecruitmentDemoApp(dependencies: dependencies));
+  await AppBootstrap.init();
+  runApp(const RecruitmentDemoApp());
 }
