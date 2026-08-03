@@ -10,6 +10,8 @@ class AppRoutes {
   static const market = '/market';
   static const marketDetail = '/market/detail';
   static const overlayDemo = '/demo/overlay';
+  static const fixedTabsDemo = '/demo/tabs/fixed';
+  static const dynamicPagerDemo = '/demo/tabs/dynamic-pager';
   static const message = '/message';
   static const messageDetail = '/message/detail';
   static const mine = '/mine';

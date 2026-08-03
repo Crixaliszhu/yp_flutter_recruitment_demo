@@ -70,6 +70,18 @@ class _MarketDetailPageState extends State<MarketDetailPage> {
             icon: const Icon(Icons.layers_outlined),
             label: const Text('查看 Overlay / Toast / Loading 示例'),
           ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => context.push(AppRoutes.fixedTabsDemo),
+            icon: const Icon(Icons.tab_outlined),
+            label: const Text('固定少量 Tab 保活示例'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => context.push(AppRoutes.dynamicPagerDemo),
+            icon: const Icon(Icons.view_carousel_outlined),
+            label: const Text('动态频道 PageView 缓存示例'),
+          ),
           const SizedBox(height: 12),
           const SceneCard(
             icon: Icons.receipt_long,

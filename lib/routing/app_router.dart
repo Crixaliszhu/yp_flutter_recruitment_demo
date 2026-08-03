@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../ui/core/shell/main_tab_scaffold.dart';
 import '../ui/demo/overlay/page/overlay_demo_page.dart';
+import '../ui/demo/tabs/dynamic_pager/page/dynamic_pager_demo_page.dart';
+import '../ui/demo/tabs/fixed_keep_alive/page/fixed_keep_alive_tabs_demo_page.dart';
 import '../ui/home/home_detail/page/home_detail_page.dart';
 import '../ui/home/home_tab/page/home_tab_page.dart';
 import '../ui/launch/launch_page/page/launch_page.dart';
@@ -96,6 +98,18 @@ GoRouter createAppRouter() {
         path: AppRoutes.overlayDemo,
         builder: (context, state) {
           return const OverlayDemoPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.fixedTabsDemo,
+        builder: (context, state) {
+          return const FixedKeepAliveTabsDemoPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.dynamicPagerDemo,
+        builder: (context, state) {
+          return const DynamicPagerDemoPage();
         },
       ),
       GoRoute(
