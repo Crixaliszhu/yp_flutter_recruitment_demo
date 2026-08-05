@@ -22,9 +22,9 @@ android {
     defaultConfig {
         // TODO：上线前替换为正式唯一的 Application ID。
         applicationId = "com.yupao.demo.yp_flutter_recruitment_demo"
-        // 可按业务需要调整 minSdk、targetSdk、版本号等 Flutter 注入的构建配置。
+        // MMKV Android 插件要求 minSdk >= 23，因此这里显式覆盖 Flutter 默认 minSdk。
         // 配置说明：https://flutter.dev/to/review-gradle-config
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

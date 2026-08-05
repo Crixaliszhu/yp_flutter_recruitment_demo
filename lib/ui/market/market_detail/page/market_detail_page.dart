@@ -88,6 +88,12 @@ class _MarketDetailPageState extends State<MarketDetailPage> {
             icon: const Icon(Icons.storage_outlined),
             label: const Text('MMKV 响应式 KV 示例'),
           ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => context.push(AppRoutes.isolateDemo),
+            icon: const Icon(Icons.memory_outlined),
+            label: const Text('多 Isolate 开发示例'),
+          ),
           const SizedBox(height: 12),
           const SceneCard(
             icon: Icons.receipt_long,

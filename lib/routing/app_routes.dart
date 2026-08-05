@@ -13,6 +13,7 @@ class AppRoutes {
   static const fixedTabsDemo = '/demo/tabs/fixed';
   static const dynamicPagerDemo = '/demo/tabs/dynamic-pager';
   static const mmkvStorageDemo = '/demo/storage/mmkv';
+  static const isolateDemo = '/demo/isolate';
   static const message = '/message';
   static const messageDetail = '/message/detail';
   static const mine = '/mine';
